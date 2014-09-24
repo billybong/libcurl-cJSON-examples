@@ -124,44 +124,45 @@ int callGit(void) {
     return (EXIT_SUCCESS);
 }
 
-int callInvoiceService(void){
-    cJSON *root;
-    
+struct cJSON * callInvoiceService(void){
     char *jsonAsText = callhttp("http://localhost:8080/invoice");
-    root = cJSON_Parse(jsonAsText);
-    
-    printf("id: %s\n", cJSON_GetObjectItem(root, "id")->valuestring);
-    printf("amount: %f\n", cJSON_GetObjectItem(root, "amount")->valuedouble);
-    printf("note: %s\n", cJSON_GetObjectItem(root, "note")->valuestring);
-    
-    cJSON_Delete(root);
-    free(jsonAsText);
-    return 0;
+    return cJSON_Parse(jsonAsText);
 }
 
-void parse_object(cJSON * item)
+void parse_object(cJSON *item)
 {
-  cJSON *subitem = item->child;
-  while (subitem)
-  {
+    if(item->type == cJSON_Object)
+        printf("handling %s of type %i\n", item->string, item->type);
     // handle subitem  
-    switch(subitem->type){
-        case cJSON_String : printf("%s : %s\n", subitem->string , subitem->valuestring); break;
-        case cJSON_Number : printf("%s : %d\n", subitem->string , subitem->valuedouble); break;
-        default : printf("%s : %i\n", subitem->string , subitem->type);
-    }  
+    switch(item->type){
+        case cJSON_String : printf("%s : %s\n", item->string , item->valuestring); break;
+        case cJSON_Number : printf("%s : %f\n", item->string , item->valuedouble); break;
+        case cJSON_True : printf("%s : %i\n", item->string , item->valueint); break;
+        case cJSON_False : printf("%s : %i\n", item->string , item->valueint); break;
+        case cJSON_NULL : printf("%s : %s\n", item->string , "null"); break;
+        case cJSON_Array : printf("%s : %i rows\n", item->string, cJSON_GetArraySize(item));
+            if(cJSON_GetArraySize(item)>0)
+            {
+                parse_object(cJSON_GetArrayItem(item, 0));
+            }
+            break;
+        case cJSON_Object : 
+            if(item->child){
+                parse_object(item->child);
+            }
+            break;
+        default : printf("%s : %i\n", item->string , item->type);
+    }
     
-    if (subitem->child) parse_object(subitem->child);
+    item = item->next;
     
-    subitem = subitem->next;
-  }
+    if(item){
+        parse_object(item);
+    }
 }
 
 int main(void){
-    //callGit();
-    //callInvoiceService();
-    cJSON* root = cJSON_Parse("{\"id\":\"123\",\"name\":\"Billy\",\"age\":34}");
-    parse_object(root);
-    cJSON_Delete(root);
+    parse_object(callInvoiceService()->child);
+    return 0;
 }
 
