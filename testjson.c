@@ -139,8 +139,29 @@ int callInvoiceService(void){
     return 0;
 }
 
-int Xmain(void){
+void parse_object(cJSON * item)
+{
+  cJSON *subitem = item->child;
+  while (subitem)
+  {
+    // handle subitem  
+    switch(subitem->type){
+        case cJSON_String : printf("%s : %s\n", subitem->string , subitem->valuestring); break;
+        case cJSON_Number : printf("%s : %d\n", subitem->string , subitem->valuedouble); break;
+        default : printf("%s : %i\n", subitem->string , subitem->type);
+    }  
+    
+    if (subitem->child) parse_object(subitem->child);
+    
+    subitem = subitem->next;
+  }
+}
+
+int main(void){
     //callGit();
-    callInvoiceService();
+    //callInvoiceService();
+    cJSON* root = cJSON_Parse("{\"id\":\"123\",\"name\":\"Billy\",\"age\":34}");
+    parse_object(root);
+    cJSON_Delete(root);
 }
 

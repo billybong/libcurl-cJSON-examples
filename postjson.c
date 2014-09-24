@@ -89,7 +89,7 @@ int postJson(const char* data)
   return 0;
 }
 
-int main(void){
+int Xmain(void){
     cJSON* root = cJSON_CreateObject();
     cJSON_AddStringToObject(root, "id", "ingela");
     cJSON_AddNumberToObject(root, "amount", 18.0d);
