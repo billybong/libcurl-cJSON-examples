@@ -11,11 +11,20 @@ package JoweCore.Middle.Base.Json;
 public class JsonObject extends Object {
   private Unknown cJSONdelegate;
 
+  public static JsonObject parse(String js){
+    JsonObject ret;
+    ret = new JsonObject();
+    if(ret.setJson(js)){
+      return ret;
+    }
+    return null;
+  }
+
   private void setDelegate(Unknown delegate){
     this.cJSONdelegate = delegate;
   }
 
-  public boolean setJson(String del){
+  private boolean setJson(String del){
     //:$
     //: cJSON *j;
     //: j = cJSON_Parse(kStrToChar($del$));
@@ -97,8 +106,15 @@ public class JsonObject extends Object {
   }
 
   public int arraySize(){
-    //TODO: Implement
-    return 1;
+    int ret;
+
+    //:$
+    //: cJSON *j  = (cJSON *) kObjToPtr( $self:cJSONdelegate$ );  
+    //: int c = cJSON_GetArraySize(j)
+    //:
+    //:$
+    //: ret := $kIntToNum(c)$;
+    return ret;
   }
 
   public void free(){
@@ -106,5 +122,6 @@ public class JsonObject extends Object {
     //: cJSON *j  = (cJSON *) kObjToPtr( $self:cJSONdelegate$ );  
     //: cJSON_Delete(j);
     //:$
+    this.cJSONdelegate = null;
   }
 }
