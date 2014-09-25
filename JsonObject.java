@@ -1,5 +1,9 @@
 package JoweCore.Middle.Base.Json;
 
+import JoweCore.Inner.Base.StringUtil;
+import java.lang.Collection;
+import User;
+
 //:#cplusplus   
 //:$
 //: #include <stdio.h>
@@ -114,6 +118,61 @@ public class JsonObject extends Object {
     //:
     //:$
     //: ret := $kIntToNum(c)$;
+    return ret;
+  }
+
+/**
+* Evaluates a path on i.e. form "myObj.subObj.[3].child" by traversing recursively.
+* path - the path to evaluate. Includes list [] and delimiter
+* del - the delimiter to use between parent / child. Useful if key contains the default delimiter "."
+*/
+  public JsonObject eval(String path, String del){
+    JsonObject ret;
+    Collection delimiter;
+    Collection listDelimiters;
+    String currentName;
+
+    delimiter = Collection.neew();
+    if(del == null){
+      del = ".";
+    }
+
+    delimiter.add(del);
+
+    listDelimiters = Collection.neew();
+    listDelimiters.add("[");
+    listDelimiters.add("]");
+
+    Collection itemNames;
+
+    ret = this;
+    itemNames = StringUtil.split(path, delimiter);
+
+    int i;
+    for(i = 1; i <= itemNames.size(); i++){
+      currentName = itemNames.getAt(i);
+
+      if(currentName.beginsWith("[") && currentName.endsWith("]")){
+        int x;
+        x = StringUtil.split(currentName, listDelimiters).getAt(1).asInteger();
+        ret = ret.getAtArrayIndex(x);
+      }else{
+        ret = ret.getItem(itemNames.getAt(i));
+      }
+    }
+
+    return ret;
+  }
+
+  public String toString(){
+    String ret;
+    //:$
+    //: cJSON *j  = (cJSON *) kObjToPtr( $self:cJSONdelegate$ );  
+    //: char *c = j->string
+    //:
+    //:$
+    //: ret := $kPtrToStr(c, strlen(c))$;
+
     return ret;
   }
 
