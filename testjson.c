@@ -7,16 +7,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "httpclient.h"
 #include "cJSON.h"
 
 int main(void){
-    char *res = httpget("https://api.github.com/users/billybong/followers");
-    cJSON* root = cJSON_Parse(res);
-    int followers = cJSON_GetArraySize(root);
-    printf("%i followers", followers);
-    printf("%s", res);
-    free(res);
+    cJSON* root = cJSON_CreateObject();
+    
+    cJSON_AddStringToObject(root, "name", "billy");
+    cJSON_AddFalseToObject(root, "bool1");
+    cJSON_AddTrueToObject(root, "bool2");
+    cJSON_AddNullToObject(root, "nullable");
+    cJSON_AddNumberToObject(root, "number", 12);
+    cJSON_AddItemToObject(root, "child", cJSON_CreateObject());
+    cJSON_AddItemToObject(root, "childArray", cJSON_CreateArray());
+    
+    cJSON* childArray = cJSON_GetObjectItem(root, "childArray");
+    
+    //BEhöver vi ha koll på om parent är en array??
+    cJSON* childObject = cJSON_CreateObject();
+    
+    cJSON_AddItemToArray(childArray, childObject);
+    
+    printf(cJSON_Print(root));
+    
     return 0;
 }
 
